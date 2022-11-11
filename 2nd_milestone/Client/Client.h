@@ -6,6 +6,7 @@
 #include <iostream>
 #include <unistd.h>
 #include <cstring>
+#include <limits>
 using namespace std;
 
 #include "ErrorHandle.h"

@@ -27,7 +27,7 @@ Client::~Client()
 
 void Client::EnterMenu()
 {
-    int cmd;
+    int cmd = 0;
 
     cout << "-------------------------------------" << endl;
     cout << "1) Echo Message" << endl;
@@ -39,8 +39,14 @@ void Client::EnterMenu()
 
     cout << "Enter Command > ";
     cin >> cmd;
-    cin.ignore();
 
+    if(cin.fail()) 
+    {
+        cin.clear();
+    }
+
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    
     switch (cmd)
     {
     case 1:
