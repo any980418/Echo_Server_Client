@@ -18,6 +18,7 @@ public:
     bool isEnoughData(int size);
 
     int FindHeader(PacketHeader* packetHeader);
+    int FindTail();
     int ExtractData(char* buf, int len, int idx);
 
 private:

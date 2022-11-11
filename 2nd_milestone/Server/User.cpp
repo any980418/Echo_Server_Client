@@ -11,35 +11,30 @@ bool User::CopyRecvData(char* data, int len)
 void User::SendResponse()
 {
     Packet packet;
-    while(_queue.dequeue(&packet) == true)
+    while(_queue.isEnoughData(sizeof(Packet)) == true)
     {
-        switch (packet.body.cmd)
+        if(_queue.dequeue(&packet) == true)
         {
-        case CMD_SEND_MSG:
-            ResponseSendMsg(packet);
-            break;
+            switch (packet.body.cmd)
+            {
+            case CMD_SEND_MSG:
+                ResponseSendMsg(packet);
+                break;
 
-        case CMD_SAVE_MSG:
-            ResponseSaveMsg(packet);
-            break;
-        
-        case CMD_DELETE_MSG:
-            ResponseDeleteMsg(packet);
-            break;
+            case CMD_SAVE_MSG:
+                ResponseSaveMsg(packet);
+                break;
+            
+            case CMD_DELETE_MSG:
+                ResponseDeleteMsg(packet);
+                break;
 
-        case CMD_MSG_LIST:
-            ResponseMsgList();
-            break;
+            case CMD_MSG_LIST:
+                ResponseMsgList();
+                break;
+            }
         }
     }
-
-    cout << "------------Log------------" << endl;
-    for(auto it = _log.begin(); it != _log.end(); ++it)
-    {
-        cout << *it << endl;
-    }
-    cout << "---------------------------" << endl;
-
 }
 
 void User::ResponseSendMsg(Packet& packet)
@@ -106,4 +101,11 @@ void User::ResponseMsgList()
 
         send(_fd, (char*)&packet, sizeof(Packet), 0);
     }
+
+    cout << "------------Log------------" << endl;
+    for(auto it = _log.begin(); it != _log.end(); ++it)
+    {
+        cout << *it << endl;
+    }
+    cout << "---------------------------" << endl;
 }
