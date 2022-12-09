@@ -14,10 +14,12 @@ public:
     virtual ~Listener();
 
 public:
+    /* 외부에서 사용 */
     bool StartAccept(ServerService* service);
     void CloseSocket();
 
 public:
+    /* 인터페이스 구현 */
     virtual int GetSocket() override;
     virtual void Dispatch() override;
 

@@ -31,10 +31,16 @@ bool EpollCore::Register(EpollObject* epollObject, uint32_t events)
     return false;
 }
 
+bool EpollCore::Delete(int socket)
+{
+    if(epoll_ctl(_epfd, EPOLL_CTL_DEL, socket, NULL) == 0)
+        return true;
+
+    return false;
+}
+
 bool EpollCore::Dispatch()
 {
-    EpollObject* epollObject = nullptr;
-
     int eventCount = epoll_wait(_epfd, _epollEvents, EPOLL_SIZE, -1);
 
     if(eventCount == -1)
@@ -42,7 +48,7 @@ bool EpollCore::Dispatch()
 
     for(int i = 0; i < eventCount; i++)
     {
-        epollObject = reinterpret_cast<EpollObject*>(_epollEvents[i].data.ptr);
+        EpollObject* epollObject = reinterpret_cast<EpollObject*>(_epollEvents[i].data.ptr);
         epollObject->Dispatch();
     }
 

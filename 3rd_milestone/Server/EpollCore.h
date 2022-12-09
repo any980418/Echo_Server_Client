@@ -1,5 +1,6 @@
 #pragma once
 #include <sys/epoll.h>
+using namespace std;
 
 #define EPOLL_SIZE 100
 
@@ -27,6 +28,7 @@ public:
     int GetEpollFd() { return _epfd; }
 
     bool Register(EpollObject* epollObject, uint32_t events = EPOLLIN);
+    bool Delete(int socket);
     bool Dispatch();
 
 private:

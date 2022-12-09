@@ -21,42 +21,25 @@ void Service::CloseService()
     // TODO
 }
 
-Session* Service::CreateSession(int serverSocket)
+Session* Service::CreateSession()
 {
-    Session* session = _sessionFactory(serverSocket);
+    Session* session = _sessionFactory();
+    session->SetService(this);
+    AddSession(session);
 
-    if(_epollCore->Register(reinterpret_cast<EpollObject*>(session), EPOLLIN | EPOLLET) == false)
-        return nullptr;
-    
     return session;
 }
 
 void Service::AddSession(Session* session)
 {
     _sessionCount++;
-    _sessions.insert(make_pair(session->GetSocket(), session));
+    _sessions.insert(session);
 }
 
 void Service::ReleaseSession(Session* session)
 {
-    _sessions.erase(session->GetSocket());
+    _sessions.erase(session);
     _sessionCount--;
-}
-
-/*----------------
-   ClientService
------------------*/
-
-ClientService::ClientService(EpollCore* core, SessionFactory factory, int maxSessioinCount)
-    : Service(ServiceType::Client, core, factory, maxSessioinCount)
-{
-
-}
-
-bool ClientService::Start()
-{
-    // TODO
-    return true;
 }
 
 /*----------------
@@ -78,7 +61,8 @@ bool ServerService::Start()
     if(_listener == nullptr)
         return false;
 
-    if(_listener->StartAccept(this) == false)
+    ServerService* service = this;
+    if(_listener->StartAccept(service) == false)
         return false;
 
     return true;
@@ -87,4 +71,18 @@ bool ServerService::Start()
 void ServerService::CloseService()
 {
     Service::CloseService();
+}
+
+
+Session* ServerService::ConnectSession(int serverSocket)
+{
+    Session* session = _sessionFactory();
+    session->SetService(this);
+    session->Connect(serverSocket);
+    AddSession(session);
+
+    if(_epollCore->Register(reinterpret_cast<EpollObject*>(session), EPOLLIN | EPOLLET) == false)
+        return nullptr;
+    
+    return session;
 }

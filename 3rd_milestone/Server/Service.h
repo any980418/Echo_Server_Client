@@ -3,7 +3,7 @@
 #include "Listener.h"
 
 #include <functional>
-#include <map>
+#include <set>
 using namespace std;
 
 class Session;
@@ -18,7 +18,7 @@ enum class ServiceType : uint8_t
       Service
 -----------------*/
 
-using SessionFactory = function<Session*(int)>;
+using SessionFactory = function<Session*(void)>;
 
 class Service
 {
@@ -32,7 +32,7 @@ public:
     virtual void    CloseService();
     void            SetSessionFactory(SessionFactory func) { _sessionFactory = func; }
 
-    Session*        CreateSession(int serverSocket);
+    Session*        CreateSession();
     void            AddSession(Session* session);
     void            ReleaseSession(Session* session);
     int             GetCurrentSessionCount() { return _sessionCount; }
@@ -46,23 +46,10 @@ protected:
     ServiceType     _type;
     EpollCore*      _epollCore = nullptr;
 
-    map<int, Session*>  _sessions;
-    int                 _sessionCount = 0;
-    int                 _maxSessionCount = 0;
-    SessionFactory      _sessionFactory;
-};
-
-/*----------------
-   ClientService
------------------*/
-
-class ClientService : public Service
-{
-public:
-    ClientService(EpollCore* core, SessionFactory factory, int maxSessioinCount = 100);
-    virtual ~ClientService() {}
-
-    virtual bool Start() override;
+    set<Session*>   _sessions;
+    int             _sessionCount = 0;
+    int             _maxSessionCount = 0;
+    SessionFactory  _sessionFactory;
 };
 
 /*----------------
@@ -77,6 +64,8 @@ public:
 
     virtual bool Start() override;
     virtual void CloseService() override;
+
+    Session* ConnectSession(int serverSocket);
 
 private:
     Listener* _listener = nullptr;

@@ -1,11 +1,6 @@
 #include "Service.h"
 #include "Session.h"
 
-Session* CreateSession(int serverSocket)
-{
-    return new Session(serverSocket);
-}
-
 int main()
 {
     ServerService* service = new ServerService(

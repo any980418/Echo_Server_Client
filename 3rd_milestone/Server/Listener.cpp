@@ -57,6 +57,6 @@ int Listener::GetSocket()
 void Listener::Dispatch()
 {
     // connect client
-    Session* session = _service->CreateSession(_socket);
+    Session* session = _service->ConnectSession(_socket);
     cout << "Connected Client : " << session->GetSocket() << endl;
 }
